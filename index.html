@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tasty Kitchen — Artisan Sandwiches</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Six+Caps&family=League+Spartan:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            toast:       '#C97B3A',
+            'toast-deep':'#9E5C22',
+            mustard:     '#E8B84B',
+            herb:        '#4A7C59',
+            cream:       '#FFF8EE',
+            'cream-dark':'#F0E6D3',
+            ink:         '#1E1208',
+            'ink-soft':  '#5C4033',
+          },
+          fontFamily: {
+            display: ['"Six Caps"', 'sans-serif'],
+            body:    ['"League Spartan"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --toast:      #C97B3A;
+      --toast-deep: #9E5C22;
+      --mustard:    #E8B84B;
+      --herb:       #4A7C59;
+      --cream:      #FFF8EE;
+      --cream-dark: #F0E6D3;
+      --ink:        #1E1208;
+      --ink-soft:   #5C4033;
+      --spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+      --ease-out:   cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'League Spartan', system-ui, sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    /* ── Grain overlay ───────────────────────────────────────────── */
+    .grain { position: relative; }
+    .grain::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 10;
+      opacity: .035;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)'/%3E%3C/svg%3E");
+    }
+
+    /* ── Typography ──────────────────────────────────────────────── */
+    h1, h2, h3, h4 {
+      font-family: 'Six Caps', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 400;
+    }
+
+    /* ── Navbar ──────────────────────────────────────────────────── */
+    #navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      padding: 20px 0;
+      transition: background 0.3s var(--ease-out),
+                  box-shadow 0.3s var(--ease-out),
+                  padding   0.3s var(--ease-out);
+    }
+    #navbar.scrolled {
+      background: rgba(255,248,238,.9);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 1px 0 rgba(201,123,58,.14);
+      padding: 12px 0;
+    }
+
+    .nav-link {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--ink-soft);
+      text-decoration: none;
+      position: relative;
+      transition: color 0.18s ease;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; left: 0;
+      width: 0; height: 1.5px;
+      background: var(--toast);
+      transition: width 0.25s var(--spring);
+    }
+    .nav-link:hover          { color: var(--toast); }
+    .nav-link:hover::after   { width: 100%; }
+    .nav-link:focus-visible  { outline: 2px solid var(--mustard); outline-offset: 4px; border-radius: 2px; }
+
+    /* ── HSC Brand mark ──────────────────────────────────────────── */
+    .hsc-mark {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+    }
+    .hsc-text {
+      font-family: 'Six Caps', sans-serif;
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--toast);
+      letter-spacing: .14em;
+      line-height: 1;
+      text-transform: uppercase;
+    }
+
+    /* ── Buttons ─────────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'League Spartan', sans-serif;
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: .01em;
+      border-radius: 100px;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+    }
+    .btn:focus-visible { outline: 2px solid var(--mustard); outline-offset: 3px; }
+
+    .btn-primary {
+      background: var(--toast);
+      color: #fff;
+      padding: 13px 30px;
+      box-shadow: 0 4px 16px rgba(201,123,58,.35);
+      transition: background   0.22s ease,
+                  transform    0.22s var(--spring),
+                  box-shadow   0.22s ease;
+    }
+    .btn-primary:hover  { background: var(--toast-deep); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,123,58,.45); }
+    .btn-primary:active { transform: translateY(0);      box-shadow: 0 2px 8px  rgba(201,123,58,.3); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--toast);
+      padding: 11px 28px;
+      border: 2px solid var(--toast);
+      transition: background 0.22s ease,
+                  color     0.22s ease,
+                  transform 0.22s var(--spring);
+    }
+    .btn-outline:hover  { background: var(--toast); color: #fff; transform: translateY(-2px); }
+    .btn-outline:active { transform: translateY(0); }
+
+    .btn-ghost-white {
+      background: transparent;
+      color: #fff;
+      padding: 11px 28px;
+      border: 2px solid rgba(255,255,255,.7);
+      transition: background   0.22s ease,
+                  border-color 0.22s ease,
+                  color        0.22s ease,
+                  transform    0.22s var(--spring);
+    }
+    .btn-ghost-white:hover  { background: #fff; border-color: #fff; color: var(--ink); transform: translateY(-2px); }
+    .btn-ghost-white:active { transform: translateY(0); }
+
+    .btn-nav {
+      background: var(--toast);
+      color: #fff;
+      padding: 9px 22px;
+      font-size: 13px;
+      box-shadow: 0 2px 10px rgba(201,123,58,.3);
+      transition: background 0.2s ease, transform 0.2s var(--spring);
+    }
+    .btn-nav:hover { background: var(--toast-deep); transform: translateY(-1px); }
+    .btn-nav:active { transform: translateY(0); }
+
+    /* ── Hero ────────────────────────────────────────────────────── */
+    .hero-bg {
+      background-color: var(--cream);
+      background-image:
+        radial-gradient(ellipse 75% 55% at 65% 45%, rgba(201,123,58,.13) 0%, transparent 70%),
+        radial-gradient(ellipse 45% 40% at 8%  85%, rgba(74,124,89,.09)  0%, transparent 60%),
+        radial-gradient(ellipse 35% 30% at 92% 12%, rgba(232,184,75,.08) 0%, transparent 60%);
+    }
+
+    /* ── Pill badge ──────────────────────────────────────────────── */
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 16px;
+      border-radius: 100px;
+      background: rgba(201,123,58,.1);
+      border: 1px solid rgba(201,123,58,.22);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--toast);
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    /* ── Section label ───────────────────────────────────────────── */
+    .section-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--toast);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    /* ── Heading accent line ─────────────────────────────────────── */
+    .accent-line {
+      display: inline-block;
+      position: relative;
+    }
+    .accent-line::after {
+      content: '';
+      position: absolute;
+      bottom: -8px; left: 0;
+      right: 0;
+      height: 4px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, var(--mustard) 0%, transparent 100%);
+    }
+
+    /* ── Menu cards ──────────────────────────────────────────────── */
+    .menu-card {
+      border-radius: 20px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 6px 24px rgba(201,123,58,.14), 0 2px 6px rgba(0,0,0,.07);
+      transition: transform  0.32s var(--spring),
+                  box-shadow 0.32s ease;
+    }
+    .menu-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 24px 56px rgba(201,123,58,.25), 0 6px 18px rgba(0,0,0,.1);
+    }
+    .menu-card:focus-visible {
+      outline: 2px solid var(--mustard);
+      outline-offset: 3px;
+    }
+    .menu-card .card-img { position: relative; height: 220px; overflow: hidden; }
+    .menu-card .card-img img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s var(--ease-out);
+    }
+    .menu-card:hover .card-img img { transform: scale(1.05); }
+    .card-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(30,18,8,.78) 0%, transparent 55%);
+    }
+    .card-overlay-tint {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(201,123,58,.18) 0%, transparent 60%);
+      mix-blend-mode: multiply;
+    }
+
+    .price-badge {
+      position: absolute; top: 14px; right: 14px;
+      background: var(--mustard);
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 100px;
+      letter-spacing: .02em;
+    }
+    .card-title {
+      position: absolute; bottom: 14px; left: 16px; right: 16px;
+      font-family: 'Playfair Display', serif;
+      font-size: 21px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .card-body { padding: 18px 20px 22px; }
+    .card-desc {
+      font-size: 14px;
+      color: var(--ink-soft);
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+    .card-cta {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--toast);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: gap 0.2s var(--spring), color 0.18s ease;
+    }
+    .card-cta:hover { color: var(--toast-deep); gap: 8px; }
+    .card-cta:focus-visible { outline: 2px solid var(--mustard); outline-offset: 2px; border-radius: 2px; }
+
+    /* ── Feature icon ────────────────────────────────────────────── */
+    .feat-icon {
+      width: 68px; height: 68px;
+      border-radius: 50%;
+      background: var(--toast);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 18px;
+      box-shadow: 0 4px 14px rgba(201,123,58,.28);
+      transition: transform    0.28s var(--spring),
+                  box-shadow   0.28s ease;
+    }
+    .feat-icon:hover {
+      transform: scale(1.12);
+      box-shadow: 0 8px 22px rgba(201,123,58,.38);
+    }
+
+    /* ── Testimonial card ────────────────────────────────────────── */
+    .testi-card {
+      background: var(--cream-dark);
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.14);
+      transition: transform 0.3s var(--spring);
+    }
+    .testi-card:hover { transform: translateY(-6px); }
+
+    /* ── Social icon ─────────────────────────────────────────────── */
+    .social-btn {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,248,238,.18);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      background: transparent;
+      transition: background   0.2s ease,
+                  border-color 0.2s ease,
+                  transform    0.22s var(--spring);
+    }
+    .social-btn:hover   { background: var(--toast); border-color: var(--toast); transform: translateY(-2px); }
+    .social-btn:focus-visible { outline: 2px solid var(--mustard); outline-offset: 3px; }
+    .social-btn:active  { transform: translateY(0); }
+
+    /* ── Mobile menu ─────────────────────────────────────────────── */
+    #mobile-menu {
+      display: none;
+      position: absolute;
+      top: 100%; left: 0; right: 0;
+      z-index: 101;
+      background: rgba(255,248,238,.97);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-top: 1px solid rgba(201,123,58,.12);
+      padding: 20px 24px 24px;
+      transform-origin: top;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+    #mobile-menu.open { display: flex; flex-direction: column; gap: 16px; }
+
+    /* ── Stat number ─────────────────────────────────────────────── */
+    .stat-num {
+      font-family: 'Six Caps', sans-serif;
+      font-size: 40px;
+      font-weight: 400;
+      color: var(--toast);
+      letter-spacing: 0.05em;
+      line-height: 1;
+    }
+    .stat-label { font-size: 12px; color: var(--ink-soft); font-weight: 500; margin-top: 4px; letter-spacing: 0.04em; }
+
+    /* ── About pull-quote ────────────────────────────────────────── */
+    .pull-quote {
+      border-left: 3px solid var(--herb);
+      padding-left: 20px;
+      font-family: 'League Spartan', sans-serif;
+      font-size: 19px;
+      font-weight: 300;
+      font-style: italic;
+      color: var(--herb);
+      line-height: 1.6;
+      margin: 24px 0 28px;
+    }
+
+    /* ── Hero intro animation ────────────────────────────────────── */
+    #hero-intro {
+      position: absolute; inset: 0; z-index: 20;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--cream);
+      pointer-events: none;
+      transition: opacity 1.2s cubic-bezier(0.22,1,0.36,1),
+                  transform 1.2s cubic-bezier(0.22,1,0.36,1);
+    }
+    #hero-intro.exit {
+      opacity: 0;
+      transform: translateX(-5%);
+    }
+    #hero-intro-name {
+      font-family: 'Six Caps', sans-serif;
+      font-size: clamp(24px, 3.8vw, 58px);
+      letter-spacing: 0.08em;
+      color: var(--toast);
+      text-transform: uppercase;
+      line-height: 1.1;
+      text-align: center;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 0.25em;
+    }
+    .intro-word {
+      display: block;
+      animation: introDepth 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .intro-word--1 { animation-delay: 0.05s; }
+    .intro-word--2 { animation-delay: 0.43s; }
+    @keyframes introDepth {
+      from { transform: scale(0.2); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    #hero-content-wrap {
+      opacity: 0;
+      transform: translateX(30px);
+      transition: opacity 0.65s cubic-bezier(0.22,1,0.36,1),
+                  transform 0.65s cubic-bezier(0.22,1,0.36,1);
+    }
+    #hero-content-wrap.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+    .hero-tagline {
+      font-family: 'League Spartan', sans-serif;
+      font-size: clamp(18px, 2.2vw, 26px);
+      font-weight: 300;
+      color: var(--toast);
+      letter-spacing: 0.03em;
+      margin-bottom: 18px;
+      line-height: 1.3;
+    }
+
+    /* ── Hero image column ───────────────────────────────────────── */
+  .hero-img-col { display: none; }
+  @media (min-width: 1024px) { .hero-img-col { display: block; } }
+
+  /* ── Hero video column entry animation ──────────────────────── */
+  #hero-vid-col { opacity: 0; }
+  #hero-vid-col.visible {
+    animation: blurReveal 1s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes blurReveal {
+    from { opacity: 0.4; filter: blur(4px); }
+    to   { opacity: 1;   filter: blur(0px); }
+  }
+
+  /* ── Scroll fade-up animation ────────────────────────────────── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.55s var(--ease-out), transform 0.55s var(--ease-out);
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── Divider ─────────────────────────────────────────────────── */
+    .stat-divider {
+      border-top: 1px solid rgba(201,123,58,.15);
+      padding-top: 32px;
+      margin-top: 32px;
+    }
+
+    /* ── Mobile overrides (≤ 767px) ─────────────────────────────── */
+    @media (max-width: 767px) {
+      .stat-divider { gap: 20px !important; padding-top: 20px !important; margin-top: 20px !important; }
+      .about-stat-card { left: 16px !important; bottom: -16px !important; }
+      .footer-main { gap: 24px !important; }
+      .footer-nav  { gap: 20px !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     NAVBAR
+═══════════════════════════════════════════════════ -->
+<nav id="navbar">
+  <div style="max-width:1152px; margin:0 auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between;">
+
+    <!-- HSC Brand Mark -->
+    <a href="#" class="hsc-mark" aria-label="Tasty Kitchen home">
+      <!-- Horse SVG logomark (matches brand guidelines) -->
+      <svg width="26" height="26" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="
+          M54 8 C58 8 62 10 64 14 L68 11 L70 17 L65 20
+          C67 26 67 33 65 40
+          L72 55 C74 62 75 72 75 82 L69 82 L67 66 L62 58
+          L60 82 L54 82 L56 56
+          C52 50 47 44 44 39
+          L37 41 L30 37 L36 29
+          C34 24 34 19 37 15
+          C41 10 48 8 54 8 Z
+          M42 60 L38 82 L32 82 L37 58 Z
+          M62 12 C64 10 68 9 70 12 C72 15 70 19 67 19 C64 19 61 17 62 12 Z
+        " fill="#C97B3A"/>
+      </svg>
+      <span class="hsc-text">HSC</span>
+    </a>
+
+    <!-- Desktop nav -->
+    <div style="display:flex; align-items:center; gap:36px;" class="hidden md:flex">
+      <a href="#menu"    class="nav-link">Menu</a>
+      <a href="#about"   class="nav-link">About</a>
+      <a href="#specials" class="nav-link">Specials</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </div>
+
+    <!-- CTA + hamburger -->
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a href="#contact" class="btn btn-nav hidden md:inline-flex">Order Now</a>
+      <button id="hamburger" aria-label="Open navigation" style="background:none; border:none; cursor:pointer; padding:4px; display:flex; flex-direction:column; gap:5px; color:var(--ink);" class="md:hidden">
+        <span id="h1" style="display:block; width:24px; height:2px; background:currentColor; border-radius:2px; transition:transform 0.22s ease, opacity 0.22s ease;"></span>
+        <span id="h2" style="display:block; width:24px; height:2px; background:currentColor; border-radius:2px; transition:opacity 0.22s ease;"></span>
+        <span id="h3" style="display:block; width:24px; height:2px; background:currentColor; border-radius:2px; transition:transform 0.22s ease;"></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile menu -->
+  <div id="mobile-menu" role="menu">
+    <a href="#menu"    class="nav-link" style="font-size:16px;" role="menuitem">Menu</a>
+    <a href="#about"   class="nav-link" style="font-size:16px;" role="menuitem">About</a>
+    <a href="#specials" class="nav-link" style="font-size:16px;" role="menuitem">Specials</a>
+    <a href="#contact" class="nav-link" style="font-size:16px;" role="menuitem">Contact</a>
+    <a href="#contact" class="btn btn-primary" style="width:fit-content; margin-top:4px;" role="menuitem">Order Now</a>
+  </div>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════ -->
+<section class="hero-bg grain" style="min-height:100vh; display:flex; align-items:center; padding-top:90px; position:relative;">
+
+  <!-- ── Full-bleed background video ── -->
+  <video id="hero-bg-video"
+         src="design%20inputs/7964861-uhd_2160_3840_30fps.mp4"
+         autoplay muted loop playsinline
+         style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:right center; z-index:0; opacity:0.7; filter:blur(1.5px); pointer-events:none;"></video>
+  <!-- Warm cream overlay -->
+  <div style="position:absolute; inset:0; z-index:1; background:rgba(255,248,238,0.60); pointer-events:none;"></div>
+
+  <!-- ── Intro overlay: "TASTY KITCHEN" appears first ── -->
+  <div id="hero-intro" aria-hidden="true">
+    <div id="hero-intro-name" aria-label="TASTY KITCHEN">
+      <span class="intro-word intro-word--1">TASTY</span>
+      <span class="intro-word intro-word--2">KITCHEN</span>
+    </div>
+  </div>
+
+  <div style="max-width:1152px; margin:0 auto; padding:60px 24px; width:100%; position:relative; z-index:2;">
+    <div style="display:grid; grid-template-columns:1fr; gap:48px; align-items:center;" class="hero-grid">
+
+      <!-- Text column (wrapped for entry animation) -->
+      <div id="hero-content-wrap">
+      <div class="fade-up" style="max-width:600px;">
+        <div class="badge-pill" style="margin-bottom:28px;">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <circle cx="6" cy="6" r="5" fill="#E8B84B" opacity=".4"/>
+            <path d="M3.5 6l2 2 3-3" stroke="#C97B3A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Freshly Made Every Morning
+        </div>
+
+        <h1 style="font-family:'Six Caps',sans-serif; font-size:clamp(56px,8vw,110px); font-weight:400; line-height:1; letter-spacing:0.06em; color:var(--ink); text-transform:uppercase; margin-bottom:14px;">
+          Tasty Kitchen
+        </h1>
+
+        <p class="hero-tagline">Crafted to Order. Stacked with Soul.</p>
+
+        <p style="font-size:17px; line-height:1.78; color:var(--ink-soft); max-width:460px; margin-bottom:36px;">
+          Our sandwiches are made of freshly baked bread, layered with flavours that make every bite worth it.
+        </p>
+
+        <div style="display:flex; flex-wrap:wrap; gap:14px; margin-bottom:44px;">
+          <a href="#menu"  class="btn btn-primary">
+            <svg width="15" height="15" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Explore Our Menu
+          </a>
+          <a href="#about" class="btn btn-outline">Our Story</a>
+        </div>
+
+        <!-- Stats row -->
+        <div class="stat-divider" style="display:flex; flex-wrap:wrap; gap:36px;">
+          <div>
+            <div class="stat-num">12+</div>
+            <div class="stat-label">Signature Sandwiches</div>
+          </div>
+          <div>
+            <div class="stat-num">100%</div>
+            <div class="stat-label">Fresh Ingredients</div>
+          </div>
+          <div>
+            <div class="stat-num">5★</div>
+            <div class="stat-label">Customer Rating</div>
+          </div>
+        </div>
+      </div>
+      </div><!-- /#hero-content-wrap -->
+
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     MENU HIGHLIGHTS
+═══════════════════════════════════════════════════ -->
+<section id="menu" style="background:var(--cream-dark); padding:100px 0;">
+  <div style="max-width:1152px; margin:0 auto; padding:0 24px;">
+
+    <!-- Heading -->
+    <div class="fade-up" style="text-align:center; margin-bottom:64px;">
+      <span class="section-label">Our Specialties</span>
+      <h2 style="font-size:clamp(30px,4vw,54px); font-weight:400; letter-spacing:0.05em; color:var(--ink); margin-bottom:18px;">
+        <span class="accent-line">The Lineup</span>
+      </h2>
+      <p style="font-size:17px; color:var(--ink-soft); line-height:1.75; max-width:500px; margin:20px auto 0;">
+        Every sandwich is crafted with intention — bold layers, balanced flavours, and bread that holds it all together.
+      </p>
+    </div>
+
+    <!-- Cards grid -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); gap:28px;">
+
+      <!-- Card 1 -->
+      <article class="menu-card fade-up" tabindex="0">
+        <div class="card-img">
+          <img src="design%20inputs/classic%20club.jpg" alt="The Classic Club sandwich">
+          <div class="card-overlay"></div>
+          <div class="card-overlay-tint"></div>
+          <span class="price-badge">$11.50</span>
+          <h3 class="card-title">The Classic Club</h3>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Triple-decker roasted turkey, crispy bacon, sharp cheddar, and herb mayo on toasted sourdough.</p>
+          <a href="#contact" class="card-cta">Order this <svg width="13" height="13" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- Card 2 -->
+      <article class="menu-card fade-up" tabindex="0" style="transition-delay:.08s;">
+        <div class="card-img">
+          <img src="design%20inputs/smoked%20bliss.jpg" alt="Smoked Bliss sandwich">
+          <div class="card-overlay"></div>
+          <div class="card-overlay-tint"></div>
+          <span class="price-badge">$13.00</span>
+          <h3 class="card-title">Smoked Bliss</h3>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Slow-smoked pulled pork, pickled slaw, chipotle aioli, and melted provolone on a brioche bun.</p>
+          <a href="#contact" class="card-cta">Order this <svg width="13" height="13" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- Card 3 -->
+      <article class="menu-card fade-up" tabindex="0" style="transition-delay:.16s;">
+        <div class="card-img">
+          <img src="design%20inputs/garden%20stack%20.jpg" alt="Garden Stack sandwich">
+          <div class="card-overlay"></div>
+          <div class="card-overlay-tint"></div>
+          <span class="price-badge">$10.00</span>
+          <h3 class="card-title">Garden Stack</h3>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Roasted seasonal vegetables, whipped feta, sun-dried tomatoes, and basil pesto on multigrain ciabatta.</p>
+          <a href="#contact" class="card-cta">Order this <svg width="13" height="13" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- Card 4 -->
+      <article class="menu-card fade-up" tabindex="0" style="transition-delay:.04s;">
+        <div class="card-img">
+          <img src="design%20inputs/crispy%20chicken.jpg" alt="Crispy Chicken sandwich">
+          <div class="card-overlay"></div>
+          <div class="card-overlay-tint"></div>
+          <span class="price-badge">$12.50</span>
+          <h3 class="card-title">Crispy Chicken</h3>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Buttermilk-fried chicken fillet, dill pickle slices, house slaw, and honey-sriracha on sesame brioche.</p>
+          <a href="#contact" class="card-cta">Order this <svg width="13" height="13" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- Card 5 -->
+      <article class="menu-card fade-up" tabindex="0" style="transition-delay:.12s;">
+        <div class="card-img">
+          <img src="design%20inputs/tuna%20melt.jpg" alt="The Tuna Melt sandwich">
+          <div class="card-overlay"></div>
+          <div class="card-overlay-tint"></div>
+          <span class="price-badge">$10.50</span>
+          <h3 class="card-title">The Tuna Melt</h3>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">Albacore tuna with capers, lemon zest, and Swiss cheese, broiled open-faced on thick white sourdough.</p>
+          <a href="#contact" class="card-cta">Order this <svg width="13" height="13" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></a>
+        </div>
+      </article>
+
+      <!-- Card 6 -->
+      <article class="menu-card fade-up" tabindex="0" style="transition-delay:.20s;">
+        <div class="card-img">
+          <img src="design%20inputs/Reuben%20sandwich.jpg" alt="The Reuben sandwich">
+          <div class="card-overlay"></div>
+          <div class="card-overlay-tint"></div>
+          <span class="price-badge">$14.00</span>
+          <h3 class="card-title">The Reuben</h3>
+        </div>
+        <div class="card-body">
+          <p class="card-desc">House-cured corned beef, sauerkraut, Russian dressing, and Gruyère on marbled rye — pressed to perfection.</p>
+          <a href="#contact" class="card-cta">Order this <svg width="13" height="13" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg></a>
+        </div>
+      </article>
+
+    </div>
+
+    <div style="text-align:center; margin-top:52px;">
+      <a href="#contact" class="btn btn-outline">View Full Menu</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     WHY TASTY KITCHEN  (feature strip)
+═══════════════════════════════════════════════════ -->
+<section id="specials" style="background:var(--cream); padding:100px 0;">
+  <div style="max-width:1152px; margin:0 auto; padding:0 24px;">
+
+    <div class="fade-up" style="text-align:center; margin-bottom:64px;">
+      <span class="section-label">The Difference</span>
+      <h2 style="font-size:clamp(28px,3.5vw,50px); font-weight:400; letter-spacing:0.05em; color:var(--ink);">
+        Why <span class="accent-line">Tasty Kitchen</span>
+      </h2>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr)); gap:40px; text-align:center;">
+
+      <div class="fade-up">
+        <div class="feat-icon">
+          <!-- Leaf/fresh icon -->
+          <svg width="28" height="28" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 22s-8-4.5-8-11.8A8 8 0 0112 2a8 8 0 018 8.2C20 17.5 12 22 12 22z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M12 22V12" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 style="font-family:'League Spartan',sans-serif; font-size:18px; font-weight:700; color:var(--ink); margin-bottom:10px;">Fresh Daily</h3>
+        <p style="font-size:14px; color:var(--ink-soft); line-height:1.75;">Ingredients sourced every morning. No freezers, no shortcuts — ever.</p>
+      </div>
+
+      <div class="fade-up" style="transition-delay:.07s;">
+        <div class="feat-icon">
+          <!-- Drop/sauce icon -->
+          <svg width="28" height="28" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2C8 8 5 12 5 15.5a7 7 0 0014 0C19 12 16 8 12 2z" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+            <path d="M9 16a3 3 0 006 0" stroke="#fff" stroke-width="1.5" stroke-linecap="round" opacity=".6"/>
+          </svg>
+        </div>
+        <h3 style="font-family:'League Spartan',sans-serif; font-size:18px; font-weight:700; color:var(--ink); margin-bottom:10px;">House-Made Sauces</h3>
+        <p style="font-size:14px; color:var(--ink-soft); line-height:1.75;">Every sauce, every spread — made in our kitchen from scratch.</p>
+      </div>
+
+      <div class="fade-up" style="transition-delay:.14s;">
+        <div class="feat-icon">
+          <!-- Bread icon -->
+          <svg width="28" height="28" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="2" y="11" width="20" height="4" rx="2" stroke="#fff" stroke-width="2"/>
+            <path d="M4 11C4 7 7 4 12 4s8 3 8 7" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+            <rect x="5" y="15" width="14" height="5" rx="1.5" stroke="#fff" stroke-width="2"/>
+          </svg>
+        </div>
+        <h3 style="font-family:'League Spartan',sans-serif; font-size:18px; font-weight:700; color:var(--ink); margin-bottom:10px;">Artisan Bread</h3>
+        <p style="font-size:14px; color:var(--ink-soft); line-height:1.75;">Baked on-site — sourdough, brioche, rye, and ciabatta daily.</p>
+      </div>
+
+      <div class="fade-up" style="transition-delay:.21s;">
+        <div class="feat-icon">
+          <!-- Custom/build icon -->
+          <svg width="28" height="28" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 style="font-family:'League Spartan',sans-serif; font-size:18px; font-weight:700; color:var(--ink); margin-bottom:10px;">Custom Build</h3>
+        <p style="font-size:14px; color:var(--ink-soft); line-height:1.75;">Pick your bread, fillings, and sauces — built exactly how you want it.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     ABOUT / STORY
+═══════════════════════════════════════════════════ -->
+<section id="about" style="padding:100px 0; position:relative; overflow:hidden; background:radial-gradient(ellipse 65% 55% at 25% 55%, rgba(240,230,211,.85), var(--cream) 70%);">
+  <div style="max-width:1152px; margin:0 auto; padding:0 24px;">
+    <div style="display:grid; grid-template-columns:1fr; gap:64px; align-items:center;" class="about-grid">
+
+      <!-- Image -->
+      <div class="fade-up" style="position:relative; order:2;">
+        <div style="border-radius:28px; overflow:hidden; box-shadow:0 28px 70px rgba(201,123,58,.18), 0 6px 18px rgba(0,0,0,.08); position:relative;">
+          <img src="design%20inputs/kitchen.jpg"
+               alt="Inside Tasty Kitchen"
+               style="width:100%; display:block; max-height:520px; object-fit:cover;">
+          <div style="position:absolute;inset:0; background:linear-gradient(135deg,rgba(232,184,75,.12) 0%,transparent 55%); mix-blend-mode:multiply; pointer-events:none;"></div>
+        </div>
+        <!-- Floating stat card -->
+        <div class="about-stat-card" style="position:absolute; bottom:-20px; left:-16px; padding:22px 28px; background:var(--ink); border-radius:20px; box-shadow:0 8px 28px rgba(0,0,0,.22);">
+          <div style="font-family:'Six Caps',sans-serif; font-size:40px; font-weight:800; color:var(--mustard); line-height:1;">8+</div>
+          <div style="font-size:13px; color:rgba(255,248,238,.65); margin-top:6px; line-height:1.5;">Years serving<br>the community</div>
+        </div>
+      </div>
+
+      <!-- Text -->
+      <div class="fade-up" style="order:1;">
+        <span class="section-label">Our Story</span>
+        <h2 style="font-size:clamp(28px,3.8vw,50px); font-weight:400; letter-spacing:0.05em; color:var(--ink); line-height:1.14; margin-bottom:8px;">
+          A sandwich is only as good as the love inside it.
+        </h2>
+        <blockquote class="pull-quote">
+          "Every layer tells a story — we just make sure it's a good one."
+        </blockquote>
+        <p style="font-size:16px; color:var(--ink-soft); line-height:1.82; margin-bottom:18px;">
+          Tasty Kitchen started as a small counter on the corner of Maple and 3rd. Eight years on, the philosophy hasn't changed — premium ingredients, honest craft, no nonsense. Our sandwiches are built to be the best part of your day.
+        </p>
+        <p style="font-size:16px; color:var(--ink-soft); line-height:1.82; margin-bottom:36px;">
+          We bake our bread on-site before the morning rush, prepare our sauces by hand, and source produce from local farmers wherever possible. This is not fast food — it's fast craft.
+        </p>
+        <a href="#contact" class="btn btn-primary">Visit Us Today</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     TESTIMONIALS
+═══════════════════════════════════════════════════ -->
+<section style="background:var(--ink); padding:100px 0;">
+  <div style="max-width:1152px; margin:0 auto; padding:0 24px;">
+
+    <div class="fade-up" style="text-align:center; margin-bottom:60px;">
+      <span class="section-label" style="color:var(--mustard);">Word on the Street</span>
+      <h2 style="font-size:clamp(28px,4vw,50px); font-weight:400; letter-spacing:0.05em; color:var(--cream);">
+        What our regulars say
+      </h2>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr)); gap:24px;">
+
+      <div class="testi-card fade-up">
+        <div style="font-family:'Six Caps',sans-serif; font-size:clamp(36px,10vw,80px); line-height:.7; color:var(--mustard); opacity:.65; margin-bottom:18px;">"</div>
+        <p style="font-size:15px; color:var(--ink); line-height:1.78; font-style:italic; margin-bottom:22px;">
+          The Reuben is genuinely one of the best sandwiches I've ever eaten. The bread alone is worth the trip. I come in every Thursday without fail.
+        </p>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:42px; height:42px; border-radius:50%; background:var(--toast); display:flex; align-items:center; justify-content:center; font-family:'Six Caps',sans-serif; font-weight:700; color:#fff; font-size:18px;">M</div>
+          <div>
+            <div style="font-weight:600; font-size:14px; color:var(--ink);">Marcus T.</div>
+            <div style="font-size:13px; color:var(--mustard); letter-spacing:.04em;">★★★★★</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card fade-up" style="transition-delay:.1s;">
+        <div style="font-family:'Six Caps',sans-serif; font-size:clamp(36px,10vw,80px); line-height:.7; color:var(--mustard); opacity:.65; margin-bottom:18px;">"</div>
+        <p style="font-size:15px; color:var(--ink); line-height:1.78; font-style:italic; margin-bottom:22px;">
+          As a vegetarian, I'm always the afterthought at sandwich places. Not here. The Garden Stack is incredible — I'd put it against any meat sandwich.
+        </p>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:42px; height:42px; border-radius:50%; background:var(--herb); display:flex; align-items:center; justify-content:center; font-family:'Six Caps',sans-serif; font-weight:700; color:#fff; font-size:18px;">S</div>
+          <div>
+            <div style="font-weight:600; font-size:14px; color:var(--ink);">Sofia L.</div>
+            <div style="font-size:13px; color:var(--mustard); letter-spacing:.04em;">★★★★★</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testi-card fade-up" style="transition-delay:.2s;">
+        <div style="font-family:'Six Caps',sans-serif; font-size:clamp(36px,10vw,80px); line-height:.7; color:var(--mustard); opacity:.65; margin-bottom:18px;">"</div>
+        <p style="font-size:15px; color:var(--ink); line-height:1.78; font-style:italic; margin-bottom:22px;">
+          Ordered the Smoked Bliss on a whim. Now my whole team orders lunch from here every Friday. The sauces are completely addictive.
+        </p>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:42px; height:42px; border-radius:50%; background:var(--mustard); display:flex; align-items:center; justify-content:center; font-family:'Six Caps',sans-serif; font-weight:700; color:var(--ink); font-size:18px;">J</div>
+          <div>
+            <div style="font-weight:600; font-size:14px; color:var(--ink);">James K.</div>
+            <div style="font-size:13px; color:var(--mustard); letter-spacing:.04em;">★★★★★</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     CTA / CONTACT BANNER
+═══════════════════════════════════════════════════ -->
+<section id="contact" class="grain" style="padding:100px 0; position:relative; overflow:hidden; background:linear-gradient(135deg, var(--toast) 0%, #D9933F 50%, var(--mustard) 100%);">
+  <!-- Subtle radial glow -->
+  <div style="position:absolute; inset:0; background:radial-gradient(ellipse 60% 80% at 20% 50%, rgba(255,255,255,.1) 0%, transparent 60%); pointer-events:none;"></div>
+
+  <div style="max-width:1152px; margin:0 auto; padding:0 24px; position:relative; z-index:2;">
+    <div style="display:grid; grid-template-columns:1fr; gap:56px; align-items:center;" class="contact-grid">
+
+      <!-- CTA text -->
+      <div class="fade-up">
+        <h2 style="font-family:'Six Caps',sans-serif; font-size:clamp(34px,5vw,62px); font-weight:400; letter-spacing:0.05em; color:#fff; line-height:1.08; margin-bottom:18px;">
+          Come hungry.<br>Leave happy.
+        </h2>
+        <p style="font-size:17px; color:rgba(255,255,255,.85); line-height:1.75; margin-bottom:34px; max-width:400px;">
+          We're open six days a week. Walk in or call ahead — we'll have it fresh and ready.
+        </p>
+        <a href="tel:+15550001234" class="btn btn-ghost-white">Get Directions →</a>
+      </div>
+
+      <!-- Info cards -->
+      <div class="fade-up" style="display:flex; flex-direction:column; gap:22px; transition-delay:.12s;">
+
+        <div style="display:flex; align-items:flex-start; gap:16px;">
+          <div style="width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,.18); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="#fff"/></svg>
+          </div>
+          <div>
+            <div style="font-weight:600; color:#fff; margin-bottom:4px;">Find Us</div>
+            <div style="font-size:15px; color:rgba(255,255,255,.78); line-height:1.6;">42 Maple Street, Corner of 3rd Ave<br>Downtown District</div>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:flex-start; gap:16px;">
+          <div style="width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,.18); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="#fff" stroke-width="2"/><path d="M12 7v5l3 3" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div style="font-weight:600; color:#fff; margin-bottom:4px;">Opening Hours</div>
+            <div style="font-size:15px; color:rgba(255,255,255,.78); line-height:1.6;">Mon – Sat: 8:00 AM – 6:00 PM<br>Sunday: Closed</div>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:flex-start; gap:16px;">
+          <div style="width:44px; height:44px; border-radius:50%; background:rgba(255,255,255,.18); display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 014.5 12 19.79 19.79 0 011.12 3.18 2 2 0 013.09 1h3a2 2 0 012 1.72 12.08 12.08 0 00.7 2.81 2 2 0 01-.45 2.11L7.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.08 12.08 0 002.81.7A2 2 0 0122 16.92z" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <div>
+            <div style="font-weight:600; color:#fff; margin-bottom:4px;">Call Ahead</div>
+            <div style="font-size:15px; color:rgba(255,255,255,.78);">+1 (555) 000-1234</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════ -->
+<footer style="background:var(--ink); padding:56px 0 32px;">
+  <div style="max-width:1152px; margin:0 auto; padding:0 24px;">
+
+    <div class="footer-main" style="display:flex; flex-wrap:wrap; gap:40px; justify-content:space-between; align-items:flex-start; margin-bottom:40px; padding-bottom:40px; border-bottom:1px solid rgba(255,248,238,.08);">
+
+      <!-- Brand block -->
+      <div>
+        <!-- Mini HSC mark -->
+        <div style="display:flex; align-items:center; gap:7px; margin-bottom:12px;">
+          <svg width="16" height="16" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+            <path d="M54 8 C58 8 62 10 64 14 L68 11 L70 17 L65 20 C67 26 67 33 65 40 L72 55 C74 62 75 72 75 82 L69 82 L67 66 L62 58 L60 82 L54 82 L56 56 C52 50 47 44 44 39 L37 41 L30 37 L36 29 C34 24 34 19 37 15 C41 10 48 8 54 8 Z M42 60 L38 82 L32 82 L37 58 Z M62 12 C64 10 68 9 70 12 C72 15 70 19 67 19 C64 19 61 17 62 12 Z" fill="#C97B3A"/>
+          </svg>
+          <span style="font-family:'Six Caps',sans-serif; font-size:18px; font-weight:400; color:#C97B3A; letter-spacing:.14em; text-transform:uppercase;">HSC</span>
+        </div>
+        <div style="font-family:'Six Caps',sans-serif; font-size:22px; font-weight:700; color:var(--cream); margin-bottom:10px;">Tasty Kitchen</div>
+        <p style="font-size:14px; color:rgba(255,248,238,.45); max-width:220px; line-height:1.7;">Artisan sandwiches, honest craft, every day.</p>
+      </div>
+
+      <!-- Nav links -->
+      <div class="footer-nav" style="display:flex; gap:48px; flex-wrap:wrap;">
+        <div>
+          <div style="font-size:11px; font-weight:600; color:rgba(255,248,238,.3); letter-spacing:.12em; text-transform:uppercase; margin-bottom:14px;">Menu</div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <a href="#menu" style="font-size:14px; color:rgba(255,248,238,.55); text-decoration:none; transition:color .18s ease;" onmouseover="this.style.color='#C97B3A'" onmouseout="this.style.color='rgba(255,248,238,.55)'">Sandwiches</a>
+            <a href="#specials" style="font-size:14px; color:rgba(255,248,238,.55); text-decoration:none; transition:color .18s ease;" onmouseover="this.style.color='#C97B3A'" onmouseout="this.style.color='rgba(255,248,238,.55)'">Specials</a>
+            <a href="#menu" style="font-size:14px; color:rgba(255,248,238,.55); text-decoration:none; transition:color .18s ease;" onmouseover="this.style.color='#C97B3A'" onmouseout="this.style.color='rgba(255,248,238,.55)'">Beverages</a>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px; font-weight:600; color:rgba(255,248,238,.3); letter-spacing:.12em; text-transform:uppercase; margin-bottom:14px;">About</div>
+          <div style="display:flex; flex-direction:column; gap:10px;">
+            <a href="#about" style="font-size:14px; color:rgba(255,248,238,.55); text-decoration:none; transition:color .18s ease;" onmouseover="this.style.color='#C97B3A'" onmouseout="this.style.color='rgba(255,248,238,.55)'">Our Story</a>
+            <a href="#about" style="font-size:14px; color:rgba(255,248,238,.55); text-decoration:none; transition:color .18s ease;" onmouseover="this.style.color='#C97B3A'" onmouseout="this.style.color='rgba(255,248,238,.55)'">Our Kitchen</a>
+            <a href="#contact" style="font-size:14px; color:rgba(255,248,238,.55); text-decoration:none; transition:color .18s ease;" onmouseover="this.style.color='#C97B3A'" onmouseout="this.style.color='rgba(255,248,238,.55)'">Contact</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Social -->
+      <div>
+        <div style="font-size:11px; font-weight:600; color:rgba(255,248,238,.3); letter-spacing:.12em; text-transform:uppercase; margin-bottom:14px;">Follow Us</div>
+        <div style="display:flex; gap:10px;">
+          <button class="social-btn" aria-label="Instagram">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#FFF8EE" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#FFF8EE" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1" fill="#FFF8EE"/></svg>
+          </button>
+          <button class="social-btn" aria-label="Facebook">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z" stroke="#FFF8EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="social-btn" aria-label="Twitter">
+            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" aria-hidden="true"><path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z" stroke="#FFF8EE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:8px; align-items:center;">
+      <p style="font-size:13px; color:rgba(255,248,238,.28);">© 2026 Tasty Kitchen. All rights reserved.</p>
+      <p style="font-size:13px; color:rgba(255,248,238,.28);">Made with care · No shortcuts.</p>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ═══════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════ -->
+<script>
+  // ── Navbar scroll ──────────────────────────────────
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 50);
+  }, { passive: true });
+
+  // ── Mobile hamburger ───────────────────────────────
+  const hamburger    = document.getElementById('hamburger');
+  const mobileMenu   = document.getElementById('mobile-menu');
+  const h1 = document.getElementById('h1');
+  const h2 = document.getElementById('h2');
+  const h3 = document.getElementById('h3');
+  let menuOpen = false;
+
+  hamburger.addEventListener('click', () => {
+    menuOpen = !menuOpen;
+    mobileMenu.classList.toggle('open', menuOpen);
+    hamburger.setAttribute('aria-expanded', menuOpen);
+    h1.style.transform = menuOpen ? 'translateY(7px) rotate(45deg)' : '';
+    h2.style.opacity   = menuOpen ? '0' : '';
+    h3.style.transform = menuOpen ? 'translateY(-7px) rotate(-45deg)' : '';
+  });
+
+  mobileMenu.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => {
+      menuOpen = false;
+      mobileMenu.classList.remove('open');
+      h1.style.transform = h3.style.transform = '';
+      h2.style.opacity = '';
+    });
+  });
+
+  // ── Scroll fade-up observer ────────────────────────
+  const fadeEls = document.querySelectorAll('.fade-up');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  fadeEls.forEach(el => observer.observe(el));
+
+  // ── Hero grid responsive ───────────────────────────
+  function setHeroGrid() {
+    const grid = document.querySelector('.hero-grid');
+    if (!grid) return;
+    grid.style.gridTemplateColumns = '1fr';
+  }
+
+  // ── About grid responsive ──────────────────────────
+  function setAboutGrid() {
+    const grid = document.querySelector('.about-grid');
+    if (!grid) return;
+    if (window.innerWidth >= 1024) {
+      grid.style.gridTemplateColumns = '1fr 1fr';
+    } else {
+      grid.style.gridTemplateColumns = '1fr';
+    }
+    const imgDiv  = grid.children[0];
+    const textDiv = grid.children[1];
+    if (window.innerWidth >= 1024) {
+      imgDiv.style.order  = '';
+      textDiv.style.order = '';
+    } else {
+      imgDiv.style.order  = '2';
+      textDiv.style.order = '1';
+    }
+  }
+
+  // ── Contact grid responsive ────────────────────────
+  function setContactGrid() {
+    const grid = document.querySelector('.contact-grid');
+    if (!grid) return;
+    grid.style.gridTemplateColumns = window.innerWidth >= 900 ? '1fr 1fr' : '1fr';
+  }
+
+  setHeroGrid();
+  setAboutGrid();
+  setContactGrid();
+  window.addEventListener('resize', () => { setHeroGrid(); setAboutGrid(); setContactGrid(); });
+
+  // ── Hero intro animation ───────────────────────────
+  const heroIntro   = document.getElementById('hero-intro');
+  const heroContent = document.getElementById('hero-content-wrap');
+  if (heroIntro && heroContent) {
+    setTimeout(() => {
+      heroIntro.classList.add('exit');
+      heroContent.classList.add('visible');
+      const heroVid = document.getElementById('hero-vid-col');
+      if (heroVid) heroVid.classList.add('visible');
+      setTimeout(() => { heroIntro.style.display = 'none'; }, 1200);
+    }, 2200);
+  }
+</script>
+
+</body>
+</html>
