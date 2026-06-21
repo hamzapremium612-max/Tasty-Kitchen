@@ -485,12 +485,23 @@
       margin-top: 32px;
     }
 
+    /* ── Navbar responsive (CSS-only, no Tailwind dependency) ───── */
+    .nav-links     { display: none; }
+    .nav-cta       { display: none; }
+    .nav-hamburger { display: flex; }
+    @media (min-width: 768px) {
+      .nav-links     { display: flex; }
+      .nav-cta       { display: inline-flex; }
+      .nav-hamburger { display: none; }
+    }
+
     /* ── Mobile overrides (≤ 767px) ─────────────────────────────── */
     @media (max-width: 767px) {
       .stat-divider { gap: 20px !important; padding-top: 20px !important; margin-top: 20px !important; }
       .about-stat-card { left: 16px !important; bottom: -16px !important; }
       .footer-main { gap: 24px !important; }
       .footer-nav  { gap: 20px !important; }
+      .hero-wrapper { padding-top: 32px !important; padding-bottom: 32px !important; }
     }
   </style>
 </head>
@@ -523,7 +534,7 @@
     </a>
 
     <!-- Desktop nav -->
-    <div style="display:flex; align-items:center; gap:36px;" class="hidden md:flex">
+    <div class="nav-links" style="align-items:center; gap:36px;">
       <a href="#menu"    class="nav-link">Menu</a>
       <a href="#about"   class="nav-link">About</a>
       <a href="#specials" class="nav-link">Specials</a>
@@ -532,8 +543,8 @@
 
     <!-- CTA + hamburger -->
     <div style="display:flex; align-items:center; gap:16px;">
-      <a href="#contact" class="btn btn-nav hidden md:inline-flex">Order Now</a>
-      <button id="hamburger" aria-label="Open navigation" style="background:none; border:none; cursor:pointer; padding:4px; display:flex; flex-direction:column; gap:5px; color:var(--ink);" class="md:hidden">
+      <a href="#contact" class="btn btn-nav nav-cta">Order Now</a>
+      <button id="hamburger" class="nav-hamburger" aria-label="Open navigation" style="background:none; border:none; cursor:pointer; padding:4px; flex-direction:column; gap:5px; color:var(--ink);">
         <span id="h1" style="display:block; width:24px; height:2px; background:currentColor; border-radius:2px; transition:transform 0.22s ease, opacity 0.22s ease;"></span>
         <span id="h2" style="display:block; width:24px; height:2px; background:currentColor; border-radius:2px; transition:opacity 0.22s ease;"></span>
         <span id="h3" style="display:block; width:24px; height:2px; background:currentColor; border-radius:2px; transition:transform 0.22s ease;"></span>
@@ -573,7 +584,7 @@
     </div>
   </div>
 
-  <div style="max-width:1152px; margin:0 auto; padding:60px 24px; width:100%; position:relative; z-index:2;">
+  <div class="hero-wrapper" style="max-width:1152px; margin:0 auto; padding:60px 24px; width:100%; position:relative; z-index:2;">
     <div style="display:grid; grid-template-columns:1fr; gap:48px; align-items:center;" class="hero-grid">
 
       <!-- Text column (wrapped for entry animation) -->
@@ -587,7 +598,7 @@
           Freshly Made Every Morning
         </div>
 
-        <h1 style="font-family:'Six Caps',sans-serif; font-size:clamp(56px,8vw,110px); font-weight:400; line-height:1; letter-spacing:0.06em; color:var(--ink); text-transform:uppercase; margin-bottom:14px;">
+        <h1 style="font-family:'Six Caps',sans-serif; font-size:clamp(36px,8vw,110px); font-weight:400; line-height:1; letter-spacing:0.06em; color:var(--ink); text-transform:uppercase; margin-bottom:14px;">
           Tasty Kitchen
         </h1>
 
